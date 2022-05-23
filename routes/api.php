@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,3 +19,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('websites', WebsiteController::class)->only(['index']);
 Route::resource('websites/{website}/posts', PostController::class)->only(['index', 'store']);
+Route::resource('websites/{website}/subscribers', SubscriberController::class)->only(['index', 'store']);
