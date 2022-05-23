@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendAllPostsToSubscribers;
 use App\Models\Post;
 use App\Models\Website;
 use App\Models\SentPost;
@@ -43,32 +44,6 @@ class SendPostsToSubscribers extends Command
      */
     public function handle()
     {
-        $website = Website::find($this->argument('website'));
-
-        if ($website)
-        {
-            $posts = Post::where('website_id', $website->id)->get();
-
-            foreach ($posts as $post)
-            {
-                $sentTo = SentPost::where('post_id', $post->id)->pluck('email');
-                $recipients = Subscriber::whereNotIn('email', $sentTo)
-                                    ->where('website_id', $website->id)
-                                    ->pluck('email');
-
-                foreach ($recipients as $recipient)
-                {
-                    Mail::to($recipient)->send(new WebsitePost($post));
-
-                    if (!Mail::failures())
-                    {
-                        SentPost::create([
-                            'post_id'       =>  $post->id,
-                            'email'         =>  $recipient
-                        ]);
-                    }
-                }
-            }
-        }
+        dispatch(new SendAllPostsToSubscribers(Website::find($this->argument('website'))));
     }
 }
